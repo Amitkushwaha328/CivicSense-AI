@@ -1,0 +1,122 @@
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+import io
+from datetime import datetime
+
+
+def generate_complaint_pdf(report: dict, complaint_id: str) -> bytes:
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+        leftMargin=20*mm, rightMargin=20*mm,
+        topMargin=20*mm, bottomMargin=20*mm)
+
+    W, _ = A4
+    CW = W - 40*mm
+    styles = getSampleStyleSheet()
+
+    DARK  = colors.HexColor("#0f172a")
+    GREEN = colors.HexColor("#16a34a")
+    GRAY  = colors.HexColor("#64748b")
+    LIGHT = colors.HexColor("#f8fafc")
+    RED   = colors.HexColor("#dc2626")
+    WHITE = colors.white
+
+    def p(txt, size=10, color=DARK, bold=False, align=TA_LEFT, leading=14):
+        return Paragraph(txt, ParagraphStyle("x", fontSize=size,
+            textColor=color, fontName="Helvetica-Bold" if bold else "Helvetica",
+            alignment=align, leading=leading))
+
+    story = []
+
+    # Header
+    hdr = Table([[
+        p("ROADSENSE AI", 18, WHITE, True, TA_LEFT),
+        p("CIVIC COMPLAINT", 10, colors.HexColor("#86efac"), False, TA_RIGHT),
+    ]], colWidths=[CW*0.6, CW*0.4])
+    hdr.setStyle(TableStyle([
+        ("BACKGROUND", (0,0),(-1,-1), DARK),
+        ("TOPPADDING",    (0,0),(-1,-1), 14),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 14),
+        ("LEFTPADDING",   (0,0),(-1,-1), 14),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 14),
+    ]))
+    story.append(hdr)
+    story.append(Spacer(1, 10))
+
+    # Complaint meta
+    meta = [
+        [p("Complaint ID:", 9, GRAY, True), p(str(complaint_id), 9)],
+        [p("Date Filed:",   9, GRAY, True), p(datetime.now().strftime("%d %B %Y, %I:%M %p"), 9)],
+        [p("Report ID:",    9, GRAY, True), p(str(report.get("id", "")), 9)],
+        [p("Status:",       9, GRAY, True), p("PENDING MUNICIPAL ACTION", 9, RED, True)],
+    ]
+    mt = Table(meta, colWidths=[CW*0.25, CW*0.75])
+    mt.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0),(-1,-1), LIGHT),
+        ("BOX",           (0,0),(-1,-1), 0.5, colors.HexColor("#e2e8f0")),
+        ("TOPPADDING",    (0,0),(-1,-1), 5),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 5),
+        ("LEFTPADDING",   (0,0),(-1,-1), 10),
+    ]))
+    story.append(mt)
+    story.append(Spacer(1, 12))
+
+    story.append(p("Issue Details", 12, DARK, True))
+    story.append(Spacer(1, 6))
+
+    severity = str(report.get("severity", "medium")).upper()
+    sev_color = RED if severity == "HIGH" else colors.HexColor("#d97706") if severity == "MEDIUM" else GREEN
+
+    details = [
+        [p("Issue Category:", 9, GRAY, True), p(str(report.get("damage_type", "Unknown")), 9, DARK, True)],
+        [p("Severity:",       9, GRAY, True), p(severity, 9, sev_color, True)],
+        [p("Location:",       9, GRAY, True), p(f"Lat: {report.get('latitude','')}, Lng: {report.get('longitude','')}", 9)],
+        [p("Address:",        9, GRAY, True), p(str(report.get("address", "Not provided")), 9)],
+        [p("Reported On:",    9, GRAY, True), p(str(report.get("created_at", datetime.now().strftime("%d %B %Y"))), 9)],
+        [p("Image URL:",      9, GRAY, True), p(str(report.get("image_url", ""))[:80] + "...", 8, colors.HexColor("#3b82f6"))],
+    ]
+    dt = Table(details, colWidths=[CW*0.3, CW*0.7])
+    dt.setStyle(TableStyle([
+        ("ROWBACKGROUNDS",  (0,0),(-1,-1), [WHITE, LIGHT]),
+        ("GRID",            (0,0),(-1,-1), 0.3, colors.HexColor("#e2e8f0")),
+        ("TOPPADDING",      (0,0),(-1,-1), 7),
+        ("BOTTOMPADDING",   (0,0),(-1,-1), 7),
+        ("LEFTPADDING",     (0,0),(-1,-1), 10),
+    ]))
+    story.append(dt)
+    story.append(Spacer(1, 12))
+
+    # Action required
+    action_box = Table([[
+        p("ACTION REQUIRED BY MUNICIPALITY", 10, WHITE, True, TA_LEFT),
+    ],[
+        p(f"This is an auto-generated complaint filed via RoadSense AI. The reported civic issue "
+          f"requires immediate attention from the relevant municipal authority. Please inspect the "
+          f"location, take corrective action, and update the complaint status in the system within "
+          f"7 working days.", 9, colors.HexColor("#fef3c7")),
+    ]], colWidths=[CW])
+    action_box.setStyle(TableStyle([
+        ("BACKGROUND",    (0,0),(-1,0), colors.HexColor("#92400e")),
+        ("BACKGROUND",    (0,1),(-1,1), colors.HexColor("#451a03")),
+        ("TOPPADDING",    (0,0),(-1,-1), 8),
+        ("BOTTOMPADDING", (0,0),(-1,-1), 8),
+        ("LEFTPADDING",   (0,0),(-1,-1), 12),
+        ("RIGHTPADDING",  (0,0),(-1,-1), 12),
+        ("ROUNDEDCORNERS",[6]),
+    ]))
+    story.append(action_box)
+    story.append(Spacer(1, 20))
+
+    story.append(HRFlowable(width=CW, thickness=0.5, color=colors.HexColor("#e2e8f0")))
+    story.append(Spacer(1, 8))
+    story.append(p("This complaint was auto-generated by RoadSense AI Civic Issue Detection Platform.",
+        8, GRAY, False, TA_CENTER))
+    story.append(p("For queries contact: support@roadsense.ai", 8, GRAY, False, TA_CENTER))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer.read()

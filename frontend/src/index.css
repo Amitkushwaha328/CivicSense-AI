@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global font: Inter ───────────────────────────────────────────── */
+* { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #0A0A0B; /* Midnight Gold theme */
+  color: #e5e2e3;            /* text-on-background */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6, .font-headline {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ── Glassmorphism + Bento utilities ─────────────────────────────── */
+@layer components {
+  .glass {
+    @apply bg-white/5 border border-white/10 backdrop-blur-md;
+  }
+  .glass-dark {
+    @apply bg-black/30 border border-white/5 backdrop-blur-xl;
+  }
+  .bento-card {
+    @apply rounded-2xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-sm
+           hover:bg-white/[0.07] hover:border-white/[0.14] transition-all duration-300;
+  }
+  /* New Theme Glass Components */
+  .glass-panel {
+    background: rgba(29, 32, 39, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(66, 71, 84, 0.15);
+    box-shadow: 0px 24px 40px rgba(173, 198, 255, 0.04);
+  }
+  .glass-gradient {
+    background: linear-gradient(135deg, rgba(173, 198, 255, 0.1) 0%, rgba(29, 32, 39, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(66, 71, 84, 0.2);
+  }
+}
+
+/* Material Icons setup */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Safe area */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 12px); }
+
+/* Pulses */
+.ai-pulse { animation: pulse-glow 2s infinite; }
+@keyframes pulse-glow {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); } 
+  70% { transform: scale(1.15); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } 
+}
+
+
+/* ── Scrollbar (Midnight Gold) ───────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0A0A0B; }
+::-webkit-scrollbar-thumb { background: #FFB95F; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #FFB786; }
+
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #32353c; border-radius: 4px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #424754; }
+
+/* ── UI Utilities ─────────────────────────────────────────────────── */
+.mask-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+@keyframes loading {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(0); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+
+/* ── Custom Gradients ────────────────────────────────────────────── */
+.bg-gradient-cyber {
+  @apply bg-gradient-to-br from-green-500/20 via-transparent to-cyan-500/20;
+}
+
+.text-gradient-green {
+  @apply bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent;
+}
+
+/* ── Map pin pulse animation ─────────────────────────────────────── */
+@keyframes pin-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.5); opacity: 0.5; }
+}
+.pin-pulse { animation: pin-pulse 1.8s ease-in-out infinite; }
+
+/* ── Leaflet dark popup overrides ────────────────────────────────── */
+.leaflet-popup-content-wrapper {
+  background: #0f172a !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  color: #f1f5f9 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
+  font-family: 'Inter', sans-serif !important;
+  backdrop-filter: blur(8px);
+}
+.leaflet-popup-tip  { background: #0f172a !important; }
+.leaflet-popup-close-button { color: #64748b !important; }

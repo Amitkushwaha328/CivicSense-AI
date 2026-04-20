@@ -1,0 +1,73 @@
+export default {
+  darkMode: "class",
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        /* ── Midnight Gold Brand Palette ── */
+        "primary":                "#FFB95F",
+        "primary-fixed-dim":      "#FFB95F",
+        "primary-fixed":          "#ffddb8",
+        "primary-container":      "#FFB95F",
+        "on-primary":             "#1a1000",
+        "on-primary-fixed":       "#2a1700",
+        "on-primary-fixed-variant":"#653e00",
+        "on-primary-container":   "#754900",
+        "secondary":              "#FFB786",
+        "secondary-fixed-dim":    "#FFB786",
+        "secondary-fixed":        "#ffdcc6",
+        "secondary-container":    "#6e3d16",
+        "on-secondary":           "#472a00",
+        "on-secondary-fixed":     "#301400",
+        "on-secondary-fixed-variant": "#6b3a14",
+        "on-secondary-container": "#efa979",
+        "tertiary":               "#bbe9ff",
+        "tertiary-fixed":         "#bbe9ff",
+        "tertiary-fixed-dim":     "#75d2f7",
+        "tertiary-container":     "#75d2f7",
+        "on-tertiary":            "#003545",
+        "on-tertiary-fixed":      "#001f29",
+        "on-tertiary-fixed-variant": "#004d63",
+        "on-tertiary-container":  "#005a72",
+        "background":             "#0A0A0B",
+        "surface":                "#131314",
+        "surface-dim":            "#131314",
+        "surface-bright":         "#3a393a",
+        "surface-container":      "#201f20",
+        "surface-container-low":  "#1c1b1c",
+        "surface-container-high": "#2a2a2b",
+        "surface-container-highest": "#353436",
+        "surface-container-lowest":  "#0e0e0f",
+        "surface-variant":        "#353436",
+        "surface-tint":           "#FFB95F",
+        "on-background":          "#e5e2e3",
+        "on-surface":             "#e5e2e3",
+        "on-surface-variant":     "#d6c3b2",
+        "outline":                "#9e8e7e",
+        "outline-variant":        "#514537",
+        "error":                  "#ffb4ab",
+        "error-container":        "#93000a",
+        "on-error":               "#690005",
+        "on-error-container":     "#ffdad6",
+        "inverse-primary":        "#855300",
+        "inverse-surface":        "#e5e2e3",
+        "inverse-on-surface":     "#313031"
+      },
+      borderRadius: {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      fontFamily: {
+        "headline": ["Outfit", "sans-serif"],
+        "body": ["Inter", "sans-serif"],
+        "label": ["Inter", "sans-serif"]
+      }
+    },
+  },
+  plugins: [],
+}

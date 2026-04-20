@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  # ── PostgreSQL Database ────────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: civicsense_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       civicsense
+      POSTGRES_USER:     civicsense_user
+      POSTGRES_PASSWORD: civicsense_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civicsense_user -d civicsense"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── FastAPI Backend ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: civicsense_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL:          postgresql://civicsense_user:civicsense_pass@db:5432/civicsense
+      JWT_SECRET:            ${JWT_SECRET}
+      JWT_ALGORITHM:         HS256
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY:    ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      GEMINI_API_KEY:        ${GEMINI_API_KEY}
+      SENDGRID_API_KEY:      ${SENDGRID_API_KEY:-}
+      EMAIL_FROM:            ${EMAIL_FROM:-noreply@civicsense.ai}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./backend/ml/saved_models:/app/ml/saved_models
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ── Redis Cache & Broker ───────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: civicsense_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  # ── Nginx Reverse Proxy ────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: civicsense_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
