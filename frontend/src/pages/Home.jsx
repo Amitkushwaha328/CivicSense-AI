@@ -518,6 +518,53 @@ export default function Home() {
           </motion.div>
         </section>
 
+
+        {/* ── ABOUT THE DEVELOPER ── */}
+        <section id="developer" className="max-w-7xl mx-auto px-8 mb-32">
+          <motion.div 
+            className="flex flex-col md:flex-row items-center gap-12 bg-surface-container-low rounded-[2.5rem] p-10 lg:p-16 border border-outline-variant/10 relative overflow-hidden"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -mr-48 -mt-48" />
+            
+            <div className="flex-shrink-0 relative">
+              <div className="w-48 h-48 lg:w-64 lg:h-64 rounded-[2rem] overflow-hidden border-2 border-primary/20 rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
+                <img 
+                  src="https://ui-avatars.com/api/?name=Amit+Kushwaha&background=FFB95F&color=1a1000&size=512&bold=true" 
+                  alt="Amit Kushwaha" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-xl rotate-12">
+                <span className="material-symbols-outlined text-black text-3xl font-bold">code</span>
+              </div>
+            </div>
+
+            <div className="flex-grow">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-4 bg-primary/10 border border-primary/20">
+                <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-primary">Master Architect</span>
+              </div>
+              <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-white mb-6">Amit Kushwaha</h2>
+              <p className="text-lg text-slate-400 leading-relaxed max-w-2xl mb-8 font-body">
+                The visionary detrás de CivicSense AI. Amit is a full-stack architect dedicated to engineering software that solves real-world urban crises. With a focus on performance and "human-first" design, he built this platform to breathe digital intelligence into modern cities.
+              </p>
+              
+              <div className="flex gap-4">
+                 <button className="flex items-center gap-2 text-sm font-bold text-white bg-white/5 hover:bg-white/10 px-5 py-2.5 rounded-xl border border-white/10 transition-all">
+                    <span className="material-symbols-outlined text-lg">terminal</span> GitHub
+                 </button>
+                 <button className="flex items-center gap-2 text-sm font-bold text-white bg-white/5 hover:bg-white/10 px-5 py-2.5 rounded-xl border border-white/10 transition-all">
+                    <span className="material-symbols-outlined text-lg">alternate_email</span> Contact
+                 </button>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
       </main>
 
       {/* ─────────────────── FOOTER ─────────────────── */}
