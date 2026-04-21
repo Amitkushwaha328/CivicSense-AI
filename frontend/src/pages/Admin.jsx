@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import API from "../api/auth";
 
-const TABS = ["Overview", "SLA Tracking", "All Reports"];
+const TABS = ["Overview", "SLA Tracking", "All Reports", "User Management"];
 
 // ── Photo Lightbox ──────────────────────────────────────────────
 function PhotoModal({ url, onClose }) {
@@ -147,9 +147,9 @@ export default function Admin() {
   const [photoUrl,     setPhotoUrl]     = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting,     setDeleting]     = useState(false);
-  const [search,       setSearch]       = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [actionModal,  setActionModal]  = useState(null); // { report, action }
+  const [newUser,      setNewUser]      = useState({ name: '', email: '', password: '', role: 'municipality' });
+  const [creatingUser, setCreatingUser] = useState(false);
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -189,7 +189,21 @@ export default function Admin() {
     if (tab === "Overview")    fetchOverview();
     if (tab === "SLA Tracking") fetchSLA();
     if (tab === "All Reports") fetchReports();
-  }, [tab]);
+  }, [tab, fetchOverview, fetchSLA, fetchReports]);
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setCreatingUser(true);
+    try {
+      await API.post("/admin/users", newUser);
+      showToast(`User ${newUser.email} created successfully!`);
+      setNewUser({ name: '', email: '', password: '', role: 'municipality' });
+    } catch (err) {
+      showToast(err.response?.data?.detail || "Failed to create user", "error");
+    } finally {
+      setCreatingUser(false);
+    }
+  };
 
   const updateStatus = async (id, status, note = '') => {
     setUpdating(id);
@@ -440,7 +454,7 @@ export default function Admin() {
           </>
 
         /* ── ALL REPORTS TAB ── */
-        ) : (
+        ) : tab === "All Reports" ? (
           <div className="bg-surface-container-low rounded-2xl border border-outline-variant/15 overflow-hidden">
             <div className="p-5 border-b border-outline-variant/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
@@ -546,6 +560,79 @@ export default function Admin() {
                 </tbody>
               </table>
             </div>
+          </div>
+        ) : (
+          /* ── USER MANAGEMENT TAB ── */
+          <div className="bg-surface-container-low rounded-2xl border border-outline-variant/15 p-8 max-w-2xl mx-auto shadow-xl">
+             <div className="mb-8">
+               <h3 className="font-outfit text-xl font-bold text-on-surface">Create Official Account</h3>
+               <p className="text-on-surface-variant text-sm mt-1">Assign a new Admin or Municipal Official ID and secure pass.</p>
+             </div>
+             
+             <form onSubmit={handleCreateUser} className="space-y-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Full Name</label>
+                    <input 
+                      type="text" required
+                      value={newUser.name}
+                      onChange={e => setNewUser({...newUser, name: e.target.value})}
+                      className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:border-primary transition"
+                      placeholder="e.g. John Doe"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Role Type</label>
+                    <select 
+                      value={newUser.role} 
+                      onChange={e => setNewUser({...newUser, role: e.target.value})}
+                      className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:border-primary transition"
+                    >
+                      <option value="municipality">Municipality Official</option>
+                      <option value="admin">System Admin</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Comm Link (Email)</label>
+                  <input 
+                    type="email" required
+                    value={newUser.email}
+                    onChange={e => setNewUser({...newUser, email: e.target.value})}
+                    className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:border-primary transition"
+                    placeholder="official@civicsense.ai"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Security Pass (Password)</label>
+                  <input 
+                    type="password" required minLength={6}
+                    value={newUser.password}
+                    onChange={e => setNewUser({...newUser, password: e.target.value})}
+                    className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:border-primary transition"
+                    placeholder="Minimum 6 characters"
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <button 
+                    type="submit" 
+                    disabled={creatingUser}
+                    className="w-full py-3 bg-primary text-on-primary font-bold rounded-xl hover:opacity-90 transition disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    {creatingUser ? (
+                      <div className="w-5 h-5 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[18px]">verified_user</span>
+                        Generate Official Identity
+                      </>
+                    )}
+                  </button>
+                </div>
+             </form>
           </div>
         )
       )}

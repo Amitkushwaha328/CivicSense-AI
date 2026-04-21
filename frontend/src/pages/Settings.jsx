@@ -5,10 +5,18 @@ export default function Settings() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Account");
 
-  const [name, setName] = useState(user?.name || "Elena Rostova");
-  const [email, setEmail] = useState(user?.email || "elena.r@civicsense.ai");
+  const [name, setName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [geoTelemetry, setGeoTelemetry] = useState(true);
   const [anonymousReporting, setAnonymousReporting] = useState(false);
+
+  const getClearance = (role) => {
+    if (role === 'admin') return { label: "Chief Operative", lv: 10, color: "text-primary" };
+    if (role === 'municipality') return { label: "Official Operative", lv: 7, color: "text-secondary" };
+    return { label: "Citizen Operative", lv: 4, color: "text-tertiary" };
+  };
+
+  const clearance = getClearance(user?.role);
 
   return (
     <div className="p-6 lg:p-10 w-full max-w-7xl mx-auto flex flex-col pb-24 lg:pb-10 min-h-screen">
@@ -57,7 +65,11 @@ export default function Settings() {
                 <div className="flex flex-col md:flex-row gap-8 items-start">
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative group cursor-pointer">
-                      <img alt="Profile" className="w-32 h-32 rounded-full object-cover border-2 border-surface-container-highest group-hover:border-primary transition-colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6MWRrE_WrLJdxGPXy7an19ijXE8yN-2OtngP9EQC9y8WCsI6E61KEpOuHX0vmJ9eZiDKOisl2ZJHm5taf48NrDgXPIVvPjVBSv7yhE_uaOLmYXctxVDSDa66dTCiJ0mRv1-A1jxyOQPiabyOyFw-W9lC8GQbWwJ4cj7fgzJbSVnZ8GOeq0FkV-ExENy4lJrD-AJeeZfc044XsDxQenH0djDCvKpMjiOzmLvzlILT1PyEk8jAjBoWVWnJww0iWoGcoXkbqPQwZBq0" />
+                      <img 
+                        alt="Profile" 
+                        className="w-32 h-32 rounded-full object-cover border-2 border-surface-container-highest group-hover:border-primary transition-colors" 
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=random&size=128`} 
+                      />
                       <div className="absolute inset-0 bg-black/50 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-sm">
                         <span className="material-symbols-outlined text-white">photo_camera</span>
                       </div>
@@ -80,7 +92,7 @@ export default function Settings() {
                       <label className="block text-sm font-medium text-on-surface-variant mb-3">Citizen Clearance Level</label>
                       <div className="inline-flex items-center gap-3 bg-surface-container-low px-4 py-2 rounded-lg border border-outline-variant/20">
                         <span className="material-symbols-outlined text-tertiary" style={{fontVariationSettings: "'FILL' 1"}}>verified_user</span>
-                        <span className="font-headline font-semibold text-tertiary tracking-wide">Level 4 - City Planner</span>
+                        <span className={`font-headline font-semibold ${clearance.color} tracking-wide`}>Level {clearance.lv} - {clearance.label}</span>
                       </div>
                     </div>
                   </div>
