@@ -147,6 +147,8 @@ export default function Admin() {
   const [photoUrl,     setPhotoUrl]     = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting,     setDeleting]     = useState(false);
+  const [search,       setSearch]       = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [actionModal,  setActionModal]  = useState(null); // { report, action }
   const [newUser,      setNewUser]      = useState({ name: '', email: '', password: '', role: 'municipality' });
   const [creatingUser, setCreatingUser] = useState(false);
