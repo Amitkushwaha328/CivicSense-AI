@@ -6,10 +6,11 @@ import csv
 import io
 from database import get_db
 from models.report import Report, ReportStatus, SeverityLevel
-from models.user import User
+from models.user import User, UserRole
 from models.complaint import Complaint
-from auth_utils import get_current_user
+from auth_utils import get_current_user, hash_password
 from redis_client import cache_response
+from pydantic import BaseModel, EmailStr
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -176,4 +177,45 @@ def sla_tracking(db: Session = Depends(get_db)):
             }
             for r in overdue_reports
         ]
-    }
+    }
+
+
+# ── User Management ──────────────────────────────────────────────
+
+class CreateOfficialRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: UserRole
+
+@router.post("/users", status_code=201)
+def create_official_user(
+    data: CreateOfficialRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Enables the super-admin to create new official accounts (Admins/Municipality).
+    """
+    # Security: Ensure only admins can create official accounts
+    if current_user.role != UserRole.admin:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Only Admins can create official accounts")
+
+    # Check if user already exists
+    existing = db.query(User).filter(User.email == data.email).first()
+    if existing:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="Email already in use")
+
+    new_user = User(
+        name=data.name,
+        email=data.email,
+        password_hash=hash_password(data.password),
+        role=data.role
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"message": f"Successfully created {data.role} account", "id": new_user.id}
