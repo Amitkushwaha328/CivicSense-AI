@@ -113,9 +113,11 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 def google_auth(data: GoogleAuthRequest, db: Session = Depends(get_db)):
     try:
         # Verify the Google JWT token
-        # client_id is optional here if we want to accept any valid google token for the project
-        # In production, specify: id_token.verify_oauth2_token(data.token, requests.Request(), settings.GOOGLE_CLIENT_ID)
-        idinfo = id_token.verify_oauth2_token(data.token, requests.Request())
+        idinfo = id_token.verify_oauth2_token(
+            data.token, 
+            requests.Request(), 
+            settings.GOOGLE_CLIENT_ID
+        )
         
         email = idinfo.get("email")
         name = idinfo.get("name", "Google User")
